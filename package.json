@@ -1,0 +1,9 @@
+{
+  "name": "web2apk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ওয়েবসাইট URL থেকে সত্যিকারের Android APK বিল্ড করার টুল — GitHub Actions + Vercel",
+  "engines": {
+    "node": ">=18"
+  }
+}
