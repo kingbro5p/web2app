@@ -1,0 +1,86 @@
+name: Build APK
+
+on:
+  repository_dispatch:
+    types: [build-apk]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      APP_NAME: ${{ github.event.client_payload.appName }}
+      PACKAGE_NAME: ${{ github.event.client_payload.packageName }}
+      SITE_URL: ${{ github.event.client_payload.siteUrl }}
+      THEME_COLOR: ${{ github.event.client_payload.themeColor }}
+      BUILD_ID: ${{ github.event.client_payload.buildId }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Create Cordova project
+        run: cordova create app_build "$PACKAGE_NAME" "$APP_NAME"
+
+      - name: Add Android platform
+        working-directory: app_build
+        run: cordova platform add android
+
+      - name: Point the app at the target website
+        working-directory: app_build
+        run: |
+          # Load the site directly in the native WebView instead of the
+          # bundled www/index.html, and allow navigation to it.
+          sed -i "s#<content src=\"index.html\" />#<content src=\"${SITE_URL}\" />#" config.xml
+          if ! grep -q "allow-navigation href=\"\*\"" config.xml; then
+            sed -i "s#</widget>#  <allow-navigation href=\"*\" />\n  <access origin=\"*\" />\n</widget>#" config.xml
+          fi
+          if [ -n "$THEME_COLOR" ]; then
+            sed -i "s#</widget>#  <preference name=\"StatusBarBackgroundColor\" value=\"${THEME_COLOR}\" />\n</widget>#" config.xml
+          fi
+          cat config.xml
+
+      - name: Build APK (unsigned debug)
+        working-directory: app_build
+        run: cordova build android
+
+      - name: Locate built APK
+        id: locate
+        run: |
+          APK_PATH=$(find app_build -name "*.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "No APK produced" >&2
+            exit 1
+          fi
+          echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Publish release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.BUILD_ID }}
+          name: "${{ env.APP_NAME }} — APK"
+          body: |
+            স্বয়ংক্রিয়ভাবে তৈরি APK, উৎস ওয়েবসাইট: ${{ env.SITE_URL }}
+            এটি একটি **unsigned debug APK** — শুধু টেস্টিংয়ের জন্য।
+            Play Store-এ প্রকাশ করতে হলে রিলিজ কী দিয়ে সাইন করে নিন।
+          files: ${{ steps.locate.outputs.apk_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
