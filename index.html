@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>web2apk — ওয়েবসাইট থেকে Android অ্যাপ</title>
+<meta name="description" content="যেকোনো ওয়েবসাইটকে সরাসরি Android APK-তে রূপান্তর করুন — GitHub Actions দিয়ে সত্যিকারের বিল্ড।" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans+Bengali:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        web2apk
+      </div>
+      <a class="topbar__link" href="https://github.com" target="_blank" rel="noopener" id="repoLink">GitHub রিপো</a>
+    </div>
+  </header>
+
+  <main class="wrap hero">
+    <section class="hero__pitch">
+      <p class="eyebrow">URL → APK, বাস্তব বিল্ড পাইপলাইন</p>
+      <h1>আপনার ওয়েবসাইট,<br />এখন একটি <em>Android অ্যাপ</em></h1>
+      <p class="hero__sub">
+        একটি লিংক দিন। GitHub Actions সত্যিকারের Cordova বিল্ড চালিয়ে
+        আপনার ওয়েবসাইটকে WebView-ভিত্তিক APK-তে রূপান্তর করবে —
+        কয়েক মিনিটেই ডাউনলোডের জন্য প্রস্তুত।
+      </p>
+
+      <div class="phone" id="phoneDemo" aria-hidden="true">
+        <div class="phone__notch"></div>
+        <div class="phone__bar">
+          <span class="phone__dot"></span>
+          <span class="phone__url" id="phoneUrl">yourbusiness.com</span>
+        </div>
+        <div class="phone__screen">
+          <div class="phone__icon" id="phoneIcon">
+            <span id="phoneIconLetter">Y</span>
+          </div>
+          <div class="phone__caption" id="phoneCaption">কম্পাইল হচ্ছে…</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card form-card">
+      <h2>বিল্ড শুরু করুন</h2>
+      <form id="buildForm" novalidate>
+        <label class="field">
+          <span>অ্যাপের নাম</span>
+          <input type="text" id="appName" placeholder="যেমন: আমার দোকান" required />
+        </label>
+
+        <label class="field">
+          <span>প্যাকেজ নাম</span>
+          <input type="text" id="packageName" class="mono" placeholder="com.example.myapp" required />
+          <small>শুধু ছোট হাতের অক্ষর, সংখ্যা ও ডট (.) — কমপক্ষে দুটি অংশ</small>
+        </label>
+
+        <label class="field">
+          <span>ওয়েবসাইট URL</span>
+          <input type="url" id="siteUrl" class="mono" placeholder="https://yourbusiness.com" required />
+        </label>
+
+        <label class="field">
+          <span>থিম কালার</span>
+          <input type="color" id="themeColor" value="#2fe076" />
+        </label>
+
+        <button type="submit" id="submitBtn" class="btn">APK বিল্ড করুন</button>
+        <p class="form-error" id="formError" role="alert"></p>
+      </form>
+    </section>
+  </main>
+
+  <section class="wrap console-wrap" id="consoleWrap" hidden>
+    <div class="console">
+      <div class="console__head">
+        <span class="led" id="led"></span>
+        <span class="console__title" id="consoleTitle">বিল্ড কনসোল</span>
+        <a href="#" id="runLink" class="console__runlink" target="_blank" rel="noopener" hidden>GitHub Actions লগ →</a>
+      </div>
+      <ol class="steps" id="steps">
+        <li data-step="queued">রিকোয়েস্ট জমা হয়েছে</li>
+        <li data-step="building">GitHub Actions বিল্ড চলছে</li>
+        <li data-step="ready">APK প্রস্তুত</li>
+      </ol>
+      <p class="console__msg" id="consoleMsg">শুরু হচ্ছে…</p>
+      <a href="#" id="downloadBtn" class="btn btn--ready" hidden download>APK ডাউনলোড করুন</a>
+    </div>
+  </section>
+
+  <section class="wrap howitworks">
+    <h2>কীভাবে কাজ করে</h2>
+    <div class="steps-grid">
+      <div class="step">
+        <h3>১. তথ্য দিন</h3>
+        <p>অ্যাপের নাম, প্যাকেজ আইডি ও আপনার ওয়েবসাইটের লিংক ফর্মে দিন।</p>
+      </div>
+      <div class="step">
+        <h3>২. আসল বিল্ড চলে</h3>
+        <p>এই সাইট একটি GitHub Actions ওয়ার্কফ্লো ট্রিগার করে, যা Cordova দিয়ে সত্যিকারের Android প্রজেক্ট বিল্ড করে।</p>
+      </div>
+      <div class="step">
+        <h3>৩. ডাউনলোড করুন</h3>
+        <p>বিল্ড শেষ হলে APK ফাইল GitHub Release-এ আপলোড হয় — সরাসরি ডাউনলোড লিংক পেয়ে যাবেন।</p>
+      </div>
+    </div>
+    <p class="note">
+      দ্রষ্টব্য: তৈরি APK একটি <strong>unsigned debug বিল্ড</strong> — টেস্টিং ও সাইডলোডের জন্য উপযুক্ত।
+      Play Store-এ প্রকাশ করতে চাইলে নিজের রিলিজ কী দিয়ে সাইন করে নিতে হবে।
+    </p>
+  </section>
+
+  <footer class="wrap footer">web2apk — GitHub + Vercel দিয়ে চালিত</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
